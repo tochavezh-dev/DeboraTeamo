@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sabor · Cocina peruana en Trujillo</title>
+  <!-- Aplica el tema guardado (o el del sistema) antes de pintar, para evitar parpadeo -->
+  <script>document.documentElement.classList.toggle('dark', localStorage.theme === 'dark' || (!('theme' in localStorage) && matchMedia('(prefers-color-scheme: dark)').matches));</script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Modo oscuro por clase (<html class="dark">) + colores y fuentes propios
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: {
+        colors: { brand: { DEFAULT: '#c2381f', dark: '#ff6b4a' } },
+        fontFamily: { serif: ['Fraunces', 'Georgia', 'serif'], sans: ['"DM Sans"', 'system-ui', 'sans-serif'] }
+      } }
+    };
+  </script>
+  <link rel="stylesheet" href="style.css">
+  <!-- Componentes propios hechos con @apply (clases de Tailwind reutilizables) -->
+  <style type="text/tailwindcss">
+    @layer components {
+      .sec { @apply px-5 py-16; }
+      .sec > * { @apply mx-auto max-w-6xl; }
+      .alt { @apply bg-amber-100/70 dark:bg-stone-900/70; }
+      .sec h2 { @apply mb-2 font-serif text-3xl font-extrabold text-brand sm:text-4xl dark:text-brand-dark; }
+      .lead { @apply text-lg text-stone-600 dark:text-stone-400; }
+      .small { @apply mt-3 text-sm text-stone-600 dark:text-stone-400; }
+      .cards { @apply mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3; }
+      .two { @apply mt-6 grid items-start gap-5 md:grid-cols-2; }
+      .card { @apply rounded-2xl border border-stone-200 bg-white p-5 shadow-lg shadow-stone-900/5 dark:border-stone-700 dark:bg-stone-900; }
+      .btn { @apply inline-block rounded-full border-2 border-brand bg-brand px-6 py-3 font-bold text-white transition hover:-translate-y-0.5 hover:brightness-110 dark:border-brand-dark dark:bg-brand-dark dark:text-stone-950; }
+      .btn-ghost { @apply bg-transparent text-brand dark:bg-transparent dark:text-brand-dark; }
+      .sm { @apply px-4 py-1.5 text-sm; }
+      .icon-btn { @apply relative grid h-10 w-10 place-items-center rounded-full border border-stone-300 bg-white dark:border-stone-700 dark:bg-stone-900; }
+      nav a { @apply whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium text-stone-600 transition dark:text-stone-300; }
+      nav a.on { @apply bg-brand text-white dark:bg-brand-dark dark:text-stone-950; }
+      .chip { @apply rounded-full border border-stone-300 bg-white px-4 py-1.5 text-sm font-medium dark:border-stone-700 dark:bg-stone-900; }
+      .chip.on { @apply border-brand bg-brand text-white dark:border-brand-dark dark:bg-brand-dark dark:text-stone-950; }
+      .dish { @apply flex flex-col gap-3 overflow-hidden p-0 transition hover:-translate-y-1; }
+      .dish img { @apply h-44 w-full object-cover; }
+      .dish > div { @apply px-5; }
+      .dish p { @apply text-sm text-stone-600 dark:text-stone-400; }
+      .dish .row { @apply mt-auto pb-5; }
+      .dish b, .promo b { @apply text-lg text-brand dark:text-brand-dark; }
+      .row { @apply flex items-center justify-between gap-2; }
+      .steps { @apply mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4; }
+      .steps li { @apply rounded-xl border-l-4 border-amber-400 bg-white p-4 text-stone-600 dark:bg-stone-900 dark:text-stone-400; }
+      .steps b { @apply block font-serif text-lg text-stone-900 dark:text-stone-100; }
+      #zone-list li, #cart-list li { @apply flex items-center justify-between gap-2 border-b border-dashed border-stone-300 py-2 dark:border-stone-700; }
+      #zone-list span, .empty { @apply text-sm italic text-stone-500; }
+      .qty { @apply inline-flex items-center gap-2 whitespace-nowrap; }
+      .qty button { @apply h-7 w-7 rounded-full border border-stone-300 dark:border-stone-600; }
+      .totals { @apply my-4; }
+      .totals b { @apply text-xl text-brand dark:text-brand-dark; }
+      form label { @apply mt-3 block text-sm font-medium; }
+      form input, form select { @apply mt-1 w-full rounded-xl border border-stone-300 bg-amber-50 px-3 py-2 dark:border-stone-600 dark:bg-stone-950; }
+      form .btn { @apply mt-4 w-full; }
+      .promo img { @apply mb-3 h-40 w-full rounded-xl object-cover; }
+      .promo p { @apply my-1 text-stone-600 dark:text-stone-400; }
+      .promo s { @apply text-stone-500; }
+      .stars { @apply tracking-widest text-amber-500; }
+      .review p { @apply my-2; }
+      .review small { @apply text-stone-500; }
+      .collage img { @apply aspect-square w-full rounded-2xl object-cover shadow-lg; }
+      .collage img:last-child { @apply mt-8; }
+      .about p { @apply mt-3; }
+      .info p { @apply mb-2; }
+    }
+  </style>
+</head>
+
+<body class="bg-amber-50 font-sans text-stone-800 transition-colors dark:bg-stone-950 dark:text-stone-100">
+
+  <div id="preloader" class="fixed inset-0 z-[99] grid place-items-center bg-amber-50 transition-opacity duration-500 dark:bg-stone-950">
+    <img src="logo.png" alt="Sabor" class="pulse h-28 w-28">
+  </div>
+
+  <!-- HEADER: en móvil el menú es una fila de "pastillas" con scroll horizontal (sin hamburguesa) -->
+  <header class="sticky top-0 z-40 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-stone-200 bg-amber-50/90 px-4 py-2 backdrop-blur dark:border-stone-800 dark:bg-stone-950/90">
+    <a href="#inicio" class="flex items-center gap-2 font-serif text-2xl font-extrabold text-brand dark:text-brand-dark">
+      <img src="logo.png" alt="" class="h-9 w-9">Sabor
+    </a>
+    <nav id="nav" aria-label="Principal" class="no-scrollbar relative order-3 flex w-full gap-1 overflow-x-auto lg:order-2 lg:ml-auto lg:w-auto">
+      <a href="#inicio">Inicio</a>
+      <a href="#menu">Carta</a>
+      <a href="#delivery">Delivery</a>
+      <a href="#promociones">Promos</a>
+      <a href="#resenas">Reseñas</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <div class="order-2 ml-auto flex gap-2 lg:order-3 lg:ml-0">
+      <a href="#delivery" class="icon-btn" aria-label="Ver mi pedido">🛒
+        <span id="cart-count" class="absolute -right-1 -top-1 min-w-5 rounded-full bg-brand px-1 text-center text-xs font-bold leading-5 text-white dark:bg-brand-dark dark:text-stone-950">0</span>
+      </a>
+      <button id="theme" class="icon-btn" aria-label="Cambiar entre modo claro y oscuro">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="inicio" class="mx-auto grid min-h-[80vh] max-w-6xl items-center gap-8 px-5 py-12 md:grid-cols-[1.1fr_.9fr]">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-widest text-brand dark:text-brand-dark">Cocina peruana · Trujillo</p>
+        <h1 class="my-3 font-serif text-5xl font-extrabold leading-tight sm:text-6xl">Sabores que <em class="text-brand dark:text-brand-dark">enamoran</em></h1>
+        <p class="lead">Platos criollos hechos con cariño, en nuestro local o en la puerta de tu casa.</p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a class="btn" href="#menu">Ver carta</a>
+          <a class="btn btn-ghost" href="#delivery">Pedir delivery</a>
+        </div>
+      </div>
+      <img src="ceviche.png" alt="Ceviche fresco" class="mx-auto aspect-square w-4/5 max-w-md rounded-full border-[6px] border-amber-400 object-cover shadow-2xl">
+    </section>
+
+    <section id="menu" class="sec">
+      <h2>Nuestra carta</h2>
+      <p class="lead">Toca “Agregar” y arma tu pedido para delivery.</p>
+      <div class="mt-5 flex flex-wrap gap-2" id="filters">
+        <button class="chip on" data-cat="todos">Todos</button>
+        <button class="chip" data-cat="entradas">Entradas</button>
+        <button class="chip" data-cat="fondos">Platos de fondo</button>
+        <button class="chip" data-cat="postres">Postres</button>
+      </div>
+      <div class="cards" id="menu-grid"></div>
+    </section>
+
+    <section id="delivery" class="sec alt">
+      <h2>Delivery</h2>
+      <p class="lead">Preparamos tu pedido al momento y lo llevamos caliente hasta tu puerta. Así funciona:</p>
+      <ol class="steps">
+        <li><b>1. Elige</b>Agrega tus platos desde la carta.</li>
+        <li><b>2. Completa</b>Pon tu nombre, dirección y zona de entrega.</li>
+        <li><b>3. Envía</b>Se abre WhatsApp con tu pedido listo para enviar.</li>
+        <li><b>4. Recibe</b>Confirmamos y te lo llevamos en 20–55 min según la zona.</li>
+      </ol>
+      <div class="two">
+        <div class="card">
+          <h3 class="font-serif text-xl font-bold">Zonas y tarifas</h3>
+          <ul id="zone-list" class="mt-2"></ul>
+          <p class="small">Pedido mínimo S/ 20 · Envío gratis desde S/ 60.<br>Pagas en efectivo, Yape/Plin o tarjeta al recibir.<br>Atendemos todos los días de 11:00 a 22:00.</p>
+        </div>
+        <form class="card" id="order">
+          <h3 class="font-serif text-xl font-bold">Tu pedido</h3>
+          <ul id="cart-list" class="mt-2"></ul>
+          <label>Nombre<input name="nombre" required autocomplete="name"></label>
+          <label>Dirección<input name="dir" required autocomplete="street-address"></label>
+          <label>Zona<select name="zona" id="zone"></select></label>
+          <label>Forma de pago
+            <select name="pago"><option>Efectivo</option><option>Yape / Plin</option><option>Tarjeta al recibir</option></select>
+          </label>
+          <p class="totals">Subtotal <span id="sub"></span> · Envío <span id="fee"></span><br><b>Total <span id="total"></span></b></p>
+          <button class="btn" type="submit">Enviar pedido por WhatsApp</button>
+          <p class="small" id="msg" role="status"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="promociones" class="sec">
+      <h2>Promociones</h2>
+      <p class="lead">Ofertas por tiempo limitado, válidas en local y delivery.</p>
+      <div class="cards">
+        <article class="card promo"><img src="ceviche.png" alt="Ceviche" loading="lazy"><h3 class="font-serif text-xl font-bold">Viernes de Ceviche 2x1</h3><p>Compra un ceviche y llévate otro gratis todos los viernes.</p><s>S/ 12</s> <b>S/ 6 c/u</b></article>
+        <article class="card promo"><img src="aji-de-gallina.png" alt="Ají de gallina" loading="lazy"><h3 class="font-serif text-xl font-bold">Combo Criollo</h3><p>Ají de gallina + bebida + postre a elección.</p><s>S/ 20</s> <b>S/ 15</b></article>
+        <article class="card promo"><img src="lomo-saltado.png" alt="Lomo saltado" loading="lazy"><h3 class="font-serif text-xl font-bold">Menú del Día</h3><p>Lomo saltado + refresco + postre a elección.</p><s>S/ 18</s> <b>S/ 14</b></article>
+      </div>
+    </section>
+
+    <section id="resenas" class="sec alt">
+      <h2>Lo que dicen de nosotros</h2>
+      <p class="lead" id="rating"></p>
+      <div class="cards" id="reviews"></div>
+    </section>
+
+    <section id="nosotros" class="sec">
+      <div class="about grid items-center gap-8 md:grid-cols-2">
+        <div class="collage grid grid-cols-2 gap-3">
+          <img src="anticuchos.png" alt="Anticuchos" loading="lazy">
+          <img src="suspiro-limeno.png" alt="Suspiro limeño" loading="lazy">
+        </div>
+        <div>
+          <h2>Sobre nosotros</h2>
+          <p>En <b>Sabor</b> celebramos la gastronomía peruana: platos tradicionales con un toque moderno, preparados con la autenticidad y el cariño de siempre.</p>
+          <p><b>Misión:</b> compartir el sabor del Perú con calidad, frescura y atención personalizada.</p>
+          <p><b>Visión:</b> ser el restaurante que mejor represente la pasión y diversidad de la cocina peruana.</p>
+          <p><b>Valores:</b> Autenticidad · Compromiso · Hospitalidad · Innovación</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto" class="sec alt">
+      <h2>Contacto y reservas</h2>
+      <p class="lead">Reserva tu mesa y te confirmamos por WhatsApp.</p>
+      <div class="two">
+        <div class="card info">
+          <p>📍 <b>Dirección:</b> Av. Miraflores 123, Trujillo, Perú</p>
+          <p>📞 <b>Teléfono:</b> +51 987 654 321</p>
+          <p>📧 <b>Correo:</b> contacto@sabor.pe</p>
+          <p>🕒 <b>Horario:</b> Lun – Dom, 11:00 a 22:00</p>
+          <a class="btn btn-ghost mt-3" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Av.+Miraflores+123+Trujillo">Cómo llegar</a>
+        </div>
+        <form class="card" id="booking">
+          <h3 class="font-serif text-xl font-bold">Reservar mesa</h3>
+          <label>Nombre<input name="nombre" required></label>
+          <label>Fecha<input type="date" name="fecha" required></label>
+          <label>Hora<input type="time" name="hora" min="11:00" max="21:30" required></label>
+          <label>Personas<input type="number" name="personas" min="1" max="20" value="2" required></label>
+          <button class="btn" type="submit">Reservar por WhatsApp</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-stone-900 px-4 py-10 text-center text-stone-200">
+    <h3 class="font-serif text-2xl font-bold">Sabor</h3>
+    <p class="mt-1">Sabores peruanos que conquistan cada paladar.</p>
+    <p class="my-4 flex flex-wrap justify-center gap-5 font-bold text-amber-400">
+      <a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://wa.me/51987654321" target="_blank" rel="noopener">WhatsApp</a>
+    </p>
+    <small class="text-stone-400">© 2026 Sabor Restaurante. Todos los derechos reservados.</small>
+  </footer>
+
+  <script>
+// ===== DATOS (cambia aquí platos, zonas y reseñas) =====
+const WHATSAPP = '51987654321';
+const MIN_PEDIDO = 20, ENVIO_GRATIS = 60;
+// [categoría, id, nombre, descripción, precio, imagen]
+const MENU = [
+  ['entradas', 'ceviche', 'Ceviche', 'Pescado fresco marinado con limón, cebolla y ají', 12, 'ceviche.png'],
+  ['entradas', 'huancaina', 'Papa a la Huancaína', 'Papas sancochadas con salsa de queso y ají amarillo', 6, 'papa-huancaina.png'],
+  ['entradas', 'anticuchos', 'Anticuchos', 'Brochetas de corazón de res con salsa de ají', 7, 'anticuchos.png'],
+  ['fondos', 'lomo', 'Lomo Saltado', 'Res salteada al wok con cebolla, tomate y papas fritas', 18, 'lomo-saltado.png'],
+  ['fondos', 'aji', 'Ají de Gallina', 'Gallina deshilachada en crema de ají amarillo con arroz', 16, 'aji-de-gallina.png'],
+  ['fondos', 'caucau', 'Cau Cau', 'Guiso de mondongo con papa, ají amarillo y hierbabuena', 15, 'cau-cau.png'],
+  ['postres', 'mazamorra', 'Mazamorra Morada', 'Postre de maíz morado con frutas y canela', 6, 'mazamorra-morada.jpg'],
+  ['postres', 'picarones', 'Picarones', 'Buñuelos de zapallo y camote con miel de chancaca', 8, 'picarones.png'],
+  ['postres', 'suspiro', 'Suspiro Limeño', 'Manjar blanco con merengue de oporto', 7, 'suspiro-limeno.png'],
+];
+// [zona, costo de envío, tiempo estimado]
+const ZONAS = [['Trujillo Centro', 3, '20–30 min'], ['Víctor Larco', 3, '25–35 min'], ['La Esperanza / El Porvenir', 5, '30–40 min'], ['Huanchaco', 8, '40–55 min']];
+// [nombre, estrellas, comentario]
+const RESENAS = [
+  ['Camila R.', 5, 'El ceviche estaba buenazo y llegó rápido a casa. Repetiremos.'],
+  ['Luis A.', 5, 'El lomo saltado tiene el sabor de casa. Atención muy amable.'],
+  ['Andrea P.', 4, 'Los picarones son lo mejor. El local es acogedor y limpio.'],
+];
+
+// ===== UTILIDADES =====
+const $ = s => document.querySelector(s);
+const soles = n => 'S/ ' + n.toFixed(2);
+const plato = id => MENU.find(m => m[1] === id);
+const enviarWhatsApp = texto => window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`, '_blank');
+
+// ===== CARTA =====
+$('#menu-grid').innerHTML = MENU.map(([cat, id, nombre, desc, precio, img]) => `
+  <article class="card dish" data-cat="${cat}">
+    <img src="${img}" alt="${nombre}" loading="lazy">
+    <div><h4>${nombre}</h4><p>${desc}</p></div>
+    <div class="row"><b>${soles(precio)}</b><button class="btn sm" data-add="${id}">Agregar</button></div>
+  </article>`).join('');
+
+$('#filters').addEventListener('click', e => {
+  const chip = e.target.closest('.chip'); if (!chip) return;
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === chip));
+  document.querySelectorAll('.dish').forEach(d => d.classList.toggle('!hidden', chip.dataset.cat !== 'todos' && d.dataset.cat !== chip.dataset.cat));
+});
+
+// ===== DELIVERY: zonas + carrito =====
+$('#zone-list').innerHTML = ZONAS.map(([z, costo, t]) => `<li>${z}<span>${soles(costo)} · ${t}</span></li>`).join('');
+$('#zone').innerHTML = ZONAS.map(([z, costo, t], i) => `<option value="${i}">${z} — ${soles(costo)} (${t})</option>`).join('');
+const carrito = {}; // { id: cantidad }
+
+function pintarCarrito() {
+  const ids = Object.keys(carrito);
+  const sub = ids.reduce((t, id) => t + plato(id)[4] * carrito[id], 0);
+  const envio = !sub || sub >= ENVIO_GRATIS ? 0 : ZONAS[$('#zone').value][1];
+  $('#cart-list').innerHTML = ids.length ? ids.map(id => `
+    <li><span>${plato(id)[2]}</span>
+      <span class="qty"><button type="button" data-q="-1" data-id="${id}" aria-label="Quitar uno">−</button>${carrito[id]}<button type="button" data-q="1" data-id="${id}" aria-label="Agregar uno">+</button></span>
+      <b>${soles(plato(id)[4] * carrito[id])}</b></li>`).join('') : '<li class="empty">Aún no agregas nada. Elige platos en la carta.</li>';
+  $('#sub').textContent = soles(sub);
+  $('#fee').textContent = sub >= ENVIO_GRATIS ? '¡Gratis!' : soles(envio);
+  $('#total').textContent = soles(sub + envio);
+  $('#cart-count').textContent = ids.reduce((n, id) => n + carrito[id], 0);
+  return { sub, envio };
+}
+function cambiar(id, delta) {
+  carrito[id] = (carrito[id] || 0) + delta;
+  if (carrito[id] <= 0) delete carrito[id];
+  pintarCarrito();
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-add],[data-q]'); if (!b) return;
+  if (b.dataset.add) { cambiar(b.dataset.add, 1); b.textContent = '✓ Agregado'; setTimeout(() => b.textContent = 'Agregar', 900); }
+  else cambiar(b.dataset.id, +b.dataset.q);
+});
+$('#zone').addEventListener('change', pintarCarrito);
+
+$('#order').addEventListener('submit', e => {
+  e.preventDefault();
+  const { sub, envio } = pintarCarrito(), f = new FormData(e.target), msg = $('#msg');
+  if (sub < MIN_PEDIDO) { msg.textContent = `El pedido mínimo es ${soles(MIN_PEDIDO)}. Agrega más platos.`; return; }
+  msg.textContent = '';
+  const lineas = Object.keys(carrito).map(id => `• ${carrito[id]} x ${plato(id)[2]}`).join('\n');
+  enviarWhatsApp(`Hola Sabor, quiero un pedido delivery:\n${lineas}\n\nSubtotal: ${soles(sub)}\nEnvío: ${soles(envio)}\nTotal: ${soles(sub + envio)}\n\nNombre: ${f.get('nombre')}\nDirección: ${f.get('dir')}\nZona: ${ZONAS[f.get('zona')][0]}\nPago: ${f.get('pago')}`);
+});
+pintarCarrito();
+
+// ===== RESERVAS =====
+$('#booking').addEventListener('submit', e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  enviarWhatsApp(`Hola Sabor, quiero reservar una mesa:\nNombre: ${f.get('nombre')}\nFecha: ${f.get('fecha')}\nHora: ${f.get('hora')}\nPersonas: ${f.get('personas')}`);
+});
+
+// ===== RESEÑAS =====
+const promedio = RESENAS.reduce((t, r) => t + r[1], 0) / RESENAS.length;
+$('#rating').textContent = `★ ${promedio.toFixed(1)} de 5 según nuestros clientes`;
+$('#reviews').innerHTML = RESENAS.map(([n, s, txt]) => `
+  <article class="card review"><span class="stars" aria-label="${s} de 5 estrellas">${'★'.repeat(s)}${'☆'.repeat(5 - s)}</span><p>“${txt}”</p><small>— ${n}</small></article>`).join('');
+
+// ===== MODO OSCURO =====
+const themeBtn = $('#theme'), root = document.documentElement;
+const iconoTema = () => themeBtn.textContent = root.classList.contains('dark') ? '☀️' : '🌙';
+iconoTema();
+themeBtn.addEventListener('click', () => {
+  root.classList.toggle('dark'); // Tailwind activa las clases dark: cuando <html> tiene .dark
+  localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
+  iconoTema();
+});
+
+// ===== MENÚ ACTIVO según la sección visible (y lo centra en la barra móvil) =====
+const nav = $('#nav'), links = [...nav.querySelectorAll('a')];
+const spy = new IntersectionObserver(entries => entries.forEach(en => {
+  if (!en.isIntersecting) return;
+  links.forEach(a => a.classList.toggle('on', a.hash === '#' + en.target.id));
+  const a = nav.querySelector('.on');
+  nav.scrollTo({ left: a.offsetLeft - nav.clientWidth / 2 + a.offsetWidth / 2, behavior: 'smooth' });
+}), { rootMargin: '-45% 0px -50% 0px' });
+document.querySelectorAll('main section').forEach(s => spy.observe(s));
+
+// ===== PRELOADER =====
+window.addEventListener('load', () => setTimeout(() => $('#preloader').classList.add('opacity-0', 'pointer-events-none'), 1200));
+  </script>
+</body>
+</html>
