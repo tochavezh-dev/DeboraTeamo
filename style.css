@@ -1,0 +1,13 @@
+/* Lo poco que Tailwind no trae listo */
+html { scroll-behavior: smooth; scroll-padding-top: 120px; }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Animación del logo en el preloader */
+.pulse { animation: pulse 2s infinite ease-in-out; }
+@keyframes pulse { 50% { transform: scale(1.15); opacity: .7; } }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
