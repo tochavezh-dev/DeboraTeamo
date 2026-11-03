@@ -75,13 +75,13 @@
 <body class="bg-amber-50 font-sans text-stone-800 transition-colors dark:bg-stone-950 dark:text-stone-100">
 
   <div id="preloader" class="fixed inset-0 z-[99] grid place-items-center bg-amber-50 transition-opacity duration-500 dark:bg-stone-950">
-    <img src="imagenes/logo.png" alt="Sabor" class="pulse h-28 w-28">
+    <img src="logo.png" alt="Sabor" class="pulse h-28 w-28">
   </div>
 
   <!-- HEADER: en móvil el menú es una fila de "pastillas" con scroll horizontal (sin hamburguesa) -->
   <header class="sticky top-0 z-40 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-stone-200 bg-amber-50/90 px-4 py-2 backdrop-blur dark:border-stone-800 dark:bg-stone-950/90">
     <a href="#inicio" class="flex items-center gap-2 font-serif text-2xl font-extrabold text-brand dark:text-brand-dark">
-      <img src="imagenes/logo.png" alt="" class="h-9 w-9">Sabor
+      <img src="logo.png" alt="" class="h-9 w-9">Sabor
     </a>
     <nav id="nav" aria-label="Principal" class="no-scrollbar relative order-3 flex w-full gap-1 overflow-x-auto lg:order-2 lg:ml-auto lg:w-auto">
       <a href="#inicio">Inicio</a>
@@ -111,7 +111,7 @@
           <a class="btn btn-ghost" href="#delivery">Pedir delivery</a>
         </div>
       </div>
-      <img src="imagenes/ceviche.png" alt="Ceviche fresco" class="mx-auto aspect-square w-4/5 max-w-md rounded-full border-[6px] border-amber-400 object-cover shadow-2xl">
+      <img src="ceviche.png" alt="Ceviche fresco" class="mx-auto aspect-square w-4/5 max-w-md rounded-full border-[6px] border-amber-400 object-cover shadow-2xl">
     </section>
 
     <section id="menu" class="sec">
@@ -161,9 +161,9 @@
       <h2>Promociones</h2>
       <p class="lead">Ofertas por tiempo limitado, válidas en local y delivery.</p>
       <div class="cards">
-        <article class="card promo"><img src="imagenes/ceviche.png" alt="Ceviche" loading="lazy"><h3 class="font-serif text-xl font-bold">Viernes de Ceviche 2x1</h3><p>Compra un ceviche y llévate otro gratis todos los viernes.</p><s>S/ 12</s> <b>S/ 6 c/u</b></article>
-        <article class="card promo"><img src="imagenes/aji-de-gallina.png" alt="Ají de gallina" loading="lazy"><h3 class="font-serif text-xl font-bold">Combo Criollo</h3><p>Ají de gallina + bebida + postre a elección.</p><s>S/ 20</s> <b>S/ 15</b></article>
-        <article class="card promo"><img src="imagenes/lomo-saltado.png" alt="Lomo saltado" loading="lazy"><h3 class="font-serif text-xl font-bold">Menú del Día</h3><p>Lomo saltado + refresco + postre a elección.</p><s>S/ 18</s> <b>S/ 14</b></article>
+        <article class="card promo"><img src="ceviche.png" alt="Ceviche" loading="lazy"><h3 class="font-serif text-xl font-bold">Viernes de Ceviche 2x1</h3><p>Compra un ceviche y llévate otro gratis todos los viernes.</p><s>S/ 12</s> <b>S/ 6 c/u</b></article>
+        <article class="card promo"><img src="aji-de-gallina.png" alt="Ají de gallina" loading="lazy"><h3 class="font-serif text-xl font-bold">Combo Criollo</h3><p>Ají de gallina + bebida + postre a elección.</p><s>S/ 20</s> <b>S/ 15</b></article>
+        <article class="card promo"><img src="lomo-saltado.png" alt="Lomo saltado" loading="lazy"><h3 class="font-serif text-xl font-bold">Menú del Día</h3><p>Lomo saltado + refresco + postre a elección.</p><s>S/ 18</s> <b>S/ 14</b></article>
       </div>
     </section>
 
@@ -176,8 +176,8 @@
     <section id="nosotros" class="sec">
       <div class="about grid items-center gap-8 md:grid-cols-2">
         <div class="collage grid grid-cols-2 gap-3">
-          <img src="imagenes/anticuchos.png" alt="Anticuchos" loading="lazy">
-          <img src="imagenes/suspiro-limeno.png" alt="Suspiro limeño" loading="lazy">
+          <img src="anticuchos.png" alt="Anticuchos" loading="lazy">
+          <img src="suspiro-limeno.png" alt="Suspiro limeño" loading="lazy">
         </div>
         <div>
           <h2>Sobre nosotros</h2>
@@ -257,7 +257,7 @@ const enviarWhatsApp = texto => window.open(`https://wa.me/${WHATSAPP}?text=${en
 // ===== CARTA =====
 $('#menu-grid').innerHTML = MENU.map(([cat, id, nombre, desc, precio, img]) => `
   <article class="card dish" data-cat="${cat}">
-    <img src="imagenes/${img}" alt="${nombre}" loading="lazy">
+    <img src="${img}" alt="${nombre}" loading="lazy">
     <div><h4>${nombre}</h4><p>${desc}</p></div>
     <div class="row"><b>${soles(precio)}</b><button class="btn sm" data-add="${id}">Agregar</button></div>
   </article>`).join('');
